@@ -30,7 +30,9 @@ Imports:
   RSQLite,
   plyr,
   raster, 
-  sp
+  sp,
+  reproducible,
+  sf
 Suggests:
   knitr,
   rmarkdown,
@@ -43,6 +45,7 @@ LazyData: true
 VignetteBuilder: knitr, rmarkdown
 Collate: 
     'aaa.R'
+    'downloadInputs.R'
     'hashDownload.R'
     'hList.R'
     'listWebData.R'
