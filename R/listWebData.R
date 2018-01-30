@@ -144,5 +144,7 @@ urls <- data.table(
     c("LandCoverOfCanada2005_V1_4.zip"),
     c("Land_Cover_2005v2_TIFF.zip"),
     c("Land_Cover_2010_TIFF.zip"),
-    c(""))
+    c("kNN-EcozonesDomain.zip","kNN-Genus.tar",
+      "kNN-LandCover.tar", "kNN-Soils.tar","kNN-Species.tar","kNN-SpeciesDominant.tar",
+      "kNN-SpeciesGroups.tar","kNN-StructureBiomass.tar","kNN-StructureStandVolume.tar"))
 )
