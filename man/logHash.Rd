@@ -22,13 +22,15 @@ Invoked for its side-effect of logging filenames and checksum values into the SQ
 If the SQLite database already exists, \code{hashdata} argument is append if not already present.
 }
 \examples{
+\dontrun{
 destfile <-tempdir()
 dbHash <- file.path(destfile, "dbHash.sqlite")
 file.list<- list.files(destfile)
 hfile <- hList(file.list, destfile, quick = TRUE)
 logHash(hfile, dbHash)
-
+}
 }
 \author{
 Melina Houle
 }
+\keyword{internal}

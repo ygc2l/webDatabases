@@ -1,3 +1,7 @@
+if (getRversion() >= "3.1.0") {
+  utils::globalVariables(c("dataset", "files"))
+}
+
 ################################################################################
 #' Retrive file available to download.
 #'
@@ -20,21 +24,23 @@
 #'
 #' @author Melina Houle
 #' @docType methods
-#' @export
-#' @importFrom data.table setkey
+#' @keywords internal
+#' @importFrom data.table setkey data.table
 #' @importFrom plyr .
 #' @importFrom RCurl getURL
 #' @importFrom XML readHTMLTable
+#' @keywords internal
 #' @rdname listWebData
 #'
 #' @examples
+#' \dontrun{
 #' dt <- data.table::data.table(
 #'   dataset = c("NFDB"),
 #'   url = c("http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/"),
 #'   password = c(NA)
 #' )
 #' path2data <- listWebData(dt, datasetName = "NFDB", dfile = "NFDB_poly_20160712_metadata.pdf")
-#'
+#' }
 listWebData <- function(urlTble, datasetName, dfile) {
   if (missing(urlTble)) {
     stop("You must provide a data.table that contain the link between url, datasetName and password.")
@@ -78,73 +84,62 @@ listWebData <- function(urlTble, datasetName, dfile) {
   return(file.list)
 }
 
-################################################################################
-#' Table of relevant dataset accessible using url
+
+#' Grab the current version of the urls either locally or from the git repository
 #'
-#' Stores dataset name with their respective url and username/password.
-#' The table is used by \code{listWebDatabases} to retrive file available to
-#' download by using only the dataset name.
+#' Running this will get latest version of the urls, returned as a data.table.
 #'
-#' @return \code{data.table} containing dataset available for download.
+#' @return
+#' Data.table with 4 \code{columns}, \code{dataset}, \code{url}, \code{password},
+#' and \code{files}, keyed by \code{dataset},
+#'  \code{files}
 #'
-#' @author Melina Houle
-#' @docType methods
+#' @param dbUrl Character string where to look for web database. Defaults to the web database
+#'              See details.
+#'
+#' @param local Logical. If \code{FALSE} the function gets the latest webDatabase table from the online
+#'              repository. This will allow for the user to be always up to date, but it also slower than
+#'              \code{TRUE}. If \code{TRUE}, then this will take the version of the webDatabase that
+#'              existed when the user installed the package.
+#'
+#' @param wide Logical. If \code{TRUE}, returns the wide form of database. Default \code{FALSE}
+#'
+#' @details
+#' The current webDatabase is located at
+#' \href{https://github.com/PredictiveEcology/webDatabases/blob/master/R/webDatabases.R}{
+#' Web Database}
 #' @importFrom data.table data.table
+#' @importFrom RCurl url.exists
 #' @export
-#' @rdname webdataset
+#' @examples
+#' data <- webDatabases()
 #'
-urls <- data.table(
-  dataset = c("AHCCD_daily",
-              "NFDB_PO",
-              "NFDB_PT",
-              "KNN",
-              "BIOSIM",
-              "LCC2005",
-              "NALCMS2005",
-              "NALCMS2010",
-              "EOSD2000"),
-  url = c("ftp://ccrp.tor.ec.gc.ca/pub/EC_data/AHCCD_daily/",
-          "http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/",
-          "http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/",
-          "ftp://tree.nfis.org/",
-          "ftp://ftp.nofc.cfs.nrcan.gc.ca/uploads/MPB/",
-          "ftp://ftp.ccrs.nrcan.gc.ca/ad/NLCCLandCover/LandcoverCanada2005_250m/",
-          "http://www.cec.org/sites/default/files/Atlas/Files/Land_Cover_2005/",
-          "http://www.cec.org/sites/default/files/Atlas/Files/Land_Cover_2010/",
-          "http://tree.pfc.forestry.ca/"),
-  password = c(NA,
-               NA,
-               NA,
-               "knn4ftp:knn4ftp",
-               NA,
-               NA,
-               NA,
-               NA,
-               NA),
-  files = list(
-    c("Adj_Daily_Rain_v2016.zip","Adj_Daily_Snow_v2016.zip","Adj_Daily_TotalP_v2016.zip",
-      "Adj_Precipitation_Documentation_v2016_Daily.doc","Adj_Precipitation_Stations_v2016.xls",
-      "Homog_daily_max_temp_v2016.zip","Homog_daily_mean_temp_v2016.zip",
-      "Homog_daily_min_temp_v2016.zip","Homog_temperature_documentation_v2016.doc",
-      "Homog_temperature_stations_v2016.xlsx",
-      "Vincent_and_coauthors_Trends_in _Canada's_Climate_JClimate_June2015.pdf",
-      "Vincent_et al_Second_Generation_Homog_Temp_JGR_2012.pdf",
-      "Wang_Feng_Vincent_Extreme_Temp_AO_2013.pdf",
-      "ZMekis_Vincent_2011.pdf"),
-    c("NFDB_poly.zip","NFDB_poly_20171106_large_fires_metadata.pdf",
-      "NFDB_poly_20171106_metadata.pdf","NFDB_poly_large_fires.zip"),
-    c("NFDB_point.zip","NFDB_point_20171106_large_fires_metadata.pdf",
-      "NFDB_point_20171106_metadata.pdf","NFDB_point_large_fires.zip",
-      "NFDB_point_large_fires_txt.zip","NFDB_point_txt.zip"),
-    c("FR_NFI_and_kNN_Mapping_20160628.docx","NFI_and_kNN_Mapping_20160628.docx",
-      "cjfr-2013-0401suppl.pdf", "kNN-EcozonesDomain.zip","kNN-Genus.tar",
-      "kNN-LandCover.tar", "kNN-Soils.tar","kNN-Species.tar","kNN-SpeciesDominant.tar",
-      "kNN-SpeciesGroups.tar","kNN-StructureBiomass.tar","kNN-StructureStandVolume.tar"),
-    c("m", "n", "v"),
-    c("LandCoverOfCanada2005_V1_4.zip"),
-    c("Land_Cover_2005v2_TIFF.zip"),
-    c("Land_Cover_2010_TIFF.zip"),
-    c("kNN-EcozonesDomain.zip","kNN-Genus.tar",
-      "kNN-LandCover.tar", "kNN-Soils.tar","kNN-Species.tar","kNN-SpeciesDominant.tar",
-      "kNN-SpeciesGroups.tar","kNN-StructureBiomass.tar","kNN-StructureStandVolume.tar"))
-)
+#' # Which datasets are available?
+#' unique(data$dataset)
+#'
+#' # pick out KNN
+#' data[dataset=="KNN"]
+webDatabases <- function(dbUrl = NULL,
+                         local = FALSE, wide = FALSE) {
+
+  if (!local) {
+    if (!RCurl::url.exists(dbUrl)) {
+      local <- FALSE
+    }
+  }
+  if (!local) {
+    if (is.null(dbUrl))
+      dbUrl <- "https://raw.githubusercontent.com/PredictiveEcology/webDatabases/master/R/webDatabases.R"
+    source(dbUrl, local = TRUE)
+    message("Database retrieved from PredictiveEcology/webDatabases")
+  } else {
+    message("Database retrieved locally because ", dbUrl, " is not reachable")
+  }
+
+  urls <- urlsWide()
+  if (!wide) {
+    urls <- urls[ , list( files = unlist( files )) , by = "dataset,url,password" ]
+    setkey(urls, dataset, files)
+  }
+  urls
+}
