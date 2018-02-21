@@ -129,9 +129,9 @@ webDatabases <- function(dbUrl = NULL,
   }
   if (!local) {
     if (is.null(dbUrl))
-      dbUrl <- "https://raw.githubusercontent.com/PredictiveEcology/webDatabases/master/R/webDatabases.R"
+      dbUrl <- "https://raw.githubusercontent.com/ygc2l/webDatabases/master/R/webDatabases.R"
     source(dbUrl, local = TRUE)
-    message("Database retrieved from PredictiveEcology/webDatabases")
+    message("Database retrieved from ygc2l/webDatabases")
   } else {
     message("Database retrieved locally because ", dbUrl, " is not reachable")
   }
